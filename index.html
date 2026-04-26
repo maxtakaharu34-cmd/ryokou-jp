@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+<meta name="theme-color" content="#0ea5e9" />
+<title>旅行先ガチャ</title>
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box}html,body{margin:0;padding:0;height:100%;overflow:hidden}
+body{font-family:system-ui,sans-serif;color:#0c4a6e;background:linear-gradient(180deg,#bae6fd,#0ea5e9);touch-action:manipulation;user-select:none;-webkit-tap-highlight-color:transparent}
+#app{display:flex;flex-direction:column;height:100dvh;padding:14px;gap:10px;max-width:480px;margin:0 auto;align-items:center}
+.title{font-family:"Mochiy Pop P One",sans-serif;font-size:24px;color:#fff;-webkit-text-stroke:2.5px #0c4a6e;paint-order:stroke fill;text-shadow:3px 3px 0 #0ea5e9;margin:6px 0}
+.modes{display:flex;gap:6px;background:rgba(255,255,255,.5);border:2px solid #0c4a6e;border-radius:999px;padding:4px}
+.modes button{background:transparent;border:0;color:#0c4a6e;padding:6px 14px;font-family:"Mochiy Pop P One",sans-serif;font-size:12px;cursor:pointer;border-radius:999px}
+.modes button.on{background:#0ea5e9;color:#fff}
+.card-wrap{flex:1;display:flex;align-items:center;justify-content:center;width:100%}
+.card{width:100%;max-width:360px;aspect-ratio:3/4;border-radius:18px;background:#fff;border:4px solid #0c4a6e;box-shadow:0 0 20px rgba(14,165,233,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:10px;text-align:center;position:relative;animation:cardIn .4s ease-out}
+@keyframes cardIn{from{opacity:0;transform:translateY(20px) rotate(-3deg)}to{opacity:1;transform:translateY(0) rotate(0)}}
+.card .em{font-size:80px;line-height:1}
+.card .nm{font-family:"Mochiy Pop P One",sans-serif;font-size:28px;color:#0ea5e9}
+.card .tag{font-size:11px;background:#bae6fd;border:1.5px solid #0c4a6e;border-radius:999px;padding:3px 10px}
+.card .desc{font-size:12px;line-height:1.7;color:#0c4a6e}
+.card .item{display:flex;justify-content:space-between;font-size:11px;width:100%;border-top:1px dashed #0ea5e9;padding-top:6px;margin-top:6px}
+.card .item:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.card .item b{color:#0ea5e9}
+.actions{display:flex;gap:10px;width:100%;justify-content:center}
+.actions button{background:#0ea5e9;color:#fff;border:3px solid #0c4a6e;padding:14px 26px;font-family:"Mochiy Pop P One",sans-serif;font-size:16px;border-radius:999px;cursor:pointer;box-shadow:3px 3px 0 #0c4a6e}
+.actions .share{background:#1da1f2}
+.actions button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0c4a6e}
+</style>
+</head>
+<body>
+<div id="app">
+<h1 class="title">旅行先ガチャ ✈️</h1>
+<div class="modes">
+  <button data-m="jp" class="on">🇯🇵 国内</button>
+  <button data-m="world">🌏 海外</button>
+  <button data-m="any">🎲 全部</button>
+</div>
+<div class="card-wrap">
+  <div class="card" id="card">
+    <div class="em">🎲</div>
+    <div class="nm">タップして引く</div>
+    <div class="desc">どこへ行こう？</div>
+  </div>
+</div>
+<div class="actions">
+  <button id="btn-go">🎰 ガチャ</button>
+  <button id="btn-share" class="share">🔗 シェア</button>
+</div>
+</div>
+<script>
+(()=>{
+'use strict';
+const SHARE_URL='https://maxtakaharu34-cmd.github.io/ryokou-jp/';
+const JP=[
+{nm:'北海道',em:'🦀',tag:'グルメ',descs:['海鮮丼が至高','ジンギスカン食べに','ラベンダー畑'],t:'1〜2泊',b:'¥3〜8万'},
+{nm:'沖縄',em:'🌺',tag:'リゾート',descs:['美ら海水族館','青い海でシュノーケル','古宇利大橋'],t:'2〜4泊',b:'¥4〜10万'},
+{nm:'京都',em:'⛩️',tag:'歴史',descs:['伏見稲荷の千本鳥居','嵐山の竹林','八坂神社'],t:'1〜2泊',b:'¥2〜6万'},
+{nm:'大阪',em:'🐙',tag:'グルメ',descs:['たこ焼き食べ歩き','道頓堀の派手さ','USJ'],t:'1〜2泊',b:'¥2〜5万'},
+{nm:'福岡',em:'🍜',tag:'グルメ',descs:['博多ラーメン','屋台で楽しむ夜','明太子'],t:'1〜2泊',b:'¥2〜5万'},
+{nm:'広島',em:'⛩️',tag:'世界遺産',descs:['宮島の鳥居','お好み焼き','原爆ドーム'],t:'1〜2泊',b:'¥2〜4万'},
+{nm:'金沢',em:'🍣',tag:'伝統',descs:['兼六園','ひがし茶屋街','近江町市場'],t:'1〜2泊',b:'¥2〜5万'},
+{nm:'熊本',em:'🌋',tag:'自然',descs:['阿蘇山','熊本城','馬刺し'],t:'1〜2泊',b:'¥2〜4万'},
+{nm:'長野',em:'⛰️',tag:'自然',descs:['上高地','善光寺','スキー'],t:'1〜2泊',b:'¥2〜4万'},
+{nm:'青森',em:'🍎',tag:'自然',descs:['ねぶた祭','奥入瀬渓流','りんご'],t:'1〜2泊',b:'¥3〜5万'}
+];
+const W=[
+{nm:'台湾',em:'🥟',tag:'近場',descs:['夜市の屋台','九份の階段','小籠包食べ放題'],t:'2〜3泊',b:'¥6〜12万'},
+{nm:'韓国',em:'🌶️',tag:'近場',descs:['焼肉とサムギョプサル','明洞ショッピング','コスメ天国'],t:'2〜3泊',b:'¥5〜10万'},
+{nm:'タイ',em:'🐘',tag:'アジア',descs:['ガパオライス','象乗り体験','寺院巡り'],t:'4〜6泊',b:'¥7〜15万'},
+{nm:'ベトナム',em:'🍜',tag:'アジア',descs:['フォー','ハロン湾','コーヒー'],t:'4〜5泊',b:'¥7〜13万'},
+{nm:'シンガポール',em:'🦁',tag:'アジア',descs:['マーライオン','チキンライス','夜景'],t:'3〜4泊',b:'¥10〜18万'},
+{nm:'ハワイ',em:'🌴',tag:'リゾート',descs:['ワイキキビーチ','パンケーキ','ダイヤモンドヘッド'],t:'5〜7泊',b:'¥20〜35万'},
+{nm:'グアム',em:'🏝️',tag:'リゾート',descs:['短時間で行ける','タモンビーチ','ステーキ'],t:'3〜4泊',b:'¥10〜18万'},
+{nm:'パリ',em:'🗼',tag:'ヨーロッパ',descs:['エッフェル塔','ルーブル美術館','クロワッサン'],t:'5〜7泊',b:'¥25〜40万'},
+{nm:'イタリア',em:'🍕',tag:'ヨーロッパ',descs:['コロッセオ','本場のピザ','ジェラート'],t:'7〜10泊',b:'¥30〜50万'},
+{nm:'ニューヨーク',em:'🗽',tag:'アメリカ',descs:['タイムズスクエア','ブロードウェイ','セントラルパーク'],t:'5〜7泊',b:'¥25〜40万'},
+{nm:'バリ島',em:'🌺',tag:'リゾート',descs:['ウブドのプール','ヨガ','ナシゴレン'],t:'5〜7泊',b:'¥15〜25万'},
+{nm:'ドバイ',em:'🐪',tag:'豪華',descs:['ブルジュ・ハリファ','砂漠サファリ','金のスーク'],t:'4〜5泊',b:'¥20〜35万'}
+];
+const $=(id)=>document.getElementById(id);
+let mode='jp',last=null;
+function pick(){
+  const arr=mode==='jp'?JP:mode==='world'?W:[...JP,...W];
+  const x=arr[Math.floor(Math.random()*arr.length)];
+  const desc=x.descs[Math.floor(Math.random()*x.descs.length)];
+  last=x;
+  const c=$('card');while(c.firstChild)c.removeChild(c.firstChild);
+  c.style.animation='none';void c.offsetWidth;c.style.animation='cardIn .4s ease-out';
+  const em=document.createElement('div');em.className='em';em.textContent=x.em;
+  const nm=document.createElement('div');nm.className='nm';nm.textContent=x.nm;
+  const tag=document.createElement('div');tag.className='tag';tag.textContent=x.tag;
+  const d=document.createElement('div');d.className='desc';d.textContent=desc;
+  c.appendChild(em);c.appendChild(nm);c.appendChild(tag);c.appendChild(d);
+  function row(k,v){const r=document.createElement('div');r.className='item';
+    const a=document.createElement('span');a.textContent=k;
+    const b=document.createElement('b');b.textContent=v;
+    r.appendChild(a);r.appendChild(b);return r}
+  c.appendChild(row('滞在目安',x.t));
+  c.appendChild(row('予算目安',x.b));
+  beep(523,.1);setTimeout(()=>beep(659,.1),60);setTimeout(()=>beep(784,.18),120);
+}
+let ac=null;const en=()=>{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();return ac};
+const beep=(f,d,t='triangle',g=.13)=>{const a=en();const o=a.createOscillator();const gn=a.createGain();o.type=t;o.frequency.value=f;gn.gain.value=g;gn.gain.exponentialRampToValueAtTime(.0001,a.currentTime+d);o.connect(gn).connect(a.destination);o.start();o.stop(a.currentTime+d)};
+$('btn-go').addEventListener('click',()=>{en();pick()});
+$('btn-share').addEventListener('click',()=>{
+  if(!last)return;
+  const txt=`旅行先ガチャ: ${last.em} ${last.nm}（${last.tag}）滞在${last.t} 予算${last.b} #旅行先ガチャ`;
+  window.open(`https://x.com/intent/post?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(SHARE_URL)}`,'_blank','noopener,noreferrer');
+});
+document.querySelectorAll('.modes button').forEach(b=>b.addEventListener('click',()=>{
+  mode=b.dataset.m;document.querySelectorAll('.modes button').forEach(x=>x.classList.toggle('on',x===b));
+}));
+})();
+</script>
+</body>
+</html>
